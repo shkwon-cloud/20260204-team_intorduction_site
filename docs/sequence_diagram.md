@@ -1,18 +1,16 @@
-# Navigation Sequence Diagram
+# System Interaction Sequence Diagram
 
 ```mermaid
 sequenceDiagram
     participant User
-    participant Navbar
-    participant Router
-    participant Layout
-    participant Outlet
-    participant PageComponent
+    participant Page as TeamPage (Assembly)
+    participant Hook as useTeam (Logic)
+    participant UI as TeamCard (Pure UI)
 
-    User->>Navbar: Click "Team" link
-    Navbar->>Router: Navigate to "/team"
-    Router->>Layout: Match Route
-    Layout->>Outlet: Update Content
-    Outlet->>PageComponent: Render TeamPage
-    PageComponent-->>User: Display Team List
+    User->>Page: Toggle "Online Only"
+    Page->>Hook: toggleFilter()
+    Hook->>Hook: Update state & filter members
+    Hook-->>Page: Return filteredMembers
+    Page->>UI: Render with filtered data
+    UI-->>User: Display updated Grid
 ```

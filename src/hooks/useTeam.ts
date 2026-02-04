@@ -1,6 +1,6 @@
 // src/hooks/useTeam.ts
 import { useState, useMemo } from 'react';
-import { TeamMember } from '../types/team';
+import type { TeamMember } from '../types/team.ts';
 
 const MOCK_MEMBERS: TeamMember[] = [
     {

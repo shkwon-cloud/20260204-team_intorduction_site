@@ -1,17 +1,36 @@
 // src/pages/Home.tsx
 import { Link } from 'react-router-dom';
+import { useWindowSize } from '../hooks/useWindowSize';
 
 const Home = () => {
+    const { width, height } = useWindowSize();
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-12 animate-in fade-in zoom-in duration-1000">
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center space-y-8 md:space-y-12 animate-in fade-in zoom-in duration-1000">
             <div className="space-y-4">
-                <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white leading-tight">
+                <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter text-white leading-tight">
                     NEXT GEN <br />
                     <span className="text-indigo-500">TEAM ALPHA</span>
                 </h1>
                 <p className="max-w-xl mx-auto text-slate-400 text-lg md:text-xl font-medium leading-relaxed">
                     Pioneering the future of digital architecture. We build systems that don't just work—they inspire.
                 </p>
+            </div>
+
+            {/* Browser Size Display */}
+            <div className="bg-slate-900/50 backdrop-blur-md border border-white/10 p-4 md:p-6 rounded-2xl space-y-2">
+                <h2 className="text-base md:text-xl font-bold text-indigo-400 uppercase tracking-widest">Browser Size</h2>
+                <div className="flex space-x-4 md:space-x-8 text-xl md:text-2xl font-black text-white">
+                    <div>
+                        <span className="text-slate-500 text-[10px] md:text-sm block uppercase tracking-tighter text-left">Width</span>
+                        {width}px
+                    </div>
+                    <div className="w-px bg-white/10" />
+                    <div>
+                        <span className="text-slate-500 text-[10px] md:text-sm block uppercase tracking-tighter text-left">Height</span>
+                        {height}px
+                    </div>
+                </div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

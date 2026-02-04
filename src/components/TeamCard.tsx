@@ -1,5 +1,5 @@
 // src/components/TeamCard.tsx
-import { TeamMember } from '../types/team';
+import type { TeamMember } from '../types/team.ts';
 
 interface TeamCardProps {
     member: TeamMember;

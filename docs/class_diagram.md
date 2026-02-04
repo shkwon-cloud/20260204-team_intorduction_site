@@ -1,39 +1,55 @@
+# Data & Component Structure (SoC)
+
+```mermaid
 classDiagram
     class TeamMember {
-        +string id
+        +number id
         +string name
         +string role
         +string bio
         +string imageUrl
+        +boolean isOnline
     }
 
-    class App {
-        +Router router
+    class useTeam {
+        +TeamMember[] members
+        +boolean onlyOnline
+        +void toggleFilter()
+    }
+
+    class useWindowSize {
+        +number width
+        +number height
     }
 
     class Layout {
+        <<Component>>
         +Navbar navbar
+        +Footer footer
         +Outlet outlet
     }
 
-    class Navbar {
-        +List links
-    }
-
     class Home {
-        +Greeting greeting
+        <<Page>>
+        +useWindowSize windowSize
     }
 
     class Team {
-        +List~TeamMember~ members
+        <<Page>>
+        +useTeam teamLogic
+        +FilterSection filter
+        +TeamCard card
     }
 
-    class MemberCard {
+    class TeamCard {
+        <<Component>>
         +TeamMember data
     }
 
-    App --> Layout : Routes To
-    Layout --> Navbar : Contains
-    Layout --> Home : Outlets To (Path: /)
-    Layout --> Team : Outlets To (Path: /team)
-    Team *-- MemberCard : Renders Many
+    Layout --> Navbar
+    Layout --> Footer
+    Home ..> useWindowSize : Uses
+    Team ..> useTeam : Uses
+    Team *-- FilterSection
+    Team *-- TeamCard : Renders Many
+```
