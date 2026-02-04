@@ -1,5 +1,3 @@
-# System Interaction Sequence Diagram
-
 ```mermaid
 sequenceDiagram
     participant User
@@ -13,4 +11,3 @@ sequenceDiagram
     Hook-->>Page: Return filteredMembers
     Page->>UI: Render with filtered data
     UI-->>User: Display updated Grid
-```
