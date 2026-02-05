@@ -7,8 +7,8 @@ interface TeamCardProps {
 
 const TeamCard = ({ member }: TeamCardProps) => {
     return (
-        <div className="group relative bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
-            <div className="aspect-square bg-slate-800 overflow-hidden relative">
+        <div className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-indigo-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/10">
+            <div className="aspect-square bg-slate-100 overflow-hidden relative">
                 <img
                     src={member.imageUrl}
                     alt={member.name}
@@ -18,12 +18,12 @@ const TeamCard = ({ member }: TeamCardProps) => {
             </div>
             <div className="p-6 space-y-2">
                 <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-semibold text-white">{member.name}</h3>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-tighter ${member.isOnline ? 'bg-green-500/10 text-green-400' : 'bg-slate-800 text-slate-500'}`}>
+                    <h3 className="text-xl font-semibold text-slate-900">{member.name}</h3>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-tighter ${member.isOnline ? 'bg-green-500/10 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
                         {member.isOnline ? 'Online' : 'Offline'}
                     </span>
                 </div>
-                <p className="text-sm font-medium text-indigo-400 uppercase tracking-wider">{member.role}</p>
+                <p className="text-sm font-medium text-indigo-600 uppercase tracking-wider">{member.role}</p>
                 <p className="text-sm text-slate-400 line-clamp-2">{member.bio}</p>
             </div>
         </div>

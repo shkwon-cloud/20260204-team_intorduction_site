@@ -3,11 +3,13 @@ import useWeather from '../hooks/useWeather';
 
 export default function WeatherWidget() {
     // 훅에서 로직을 빌려옵니다.
-    const { currentTemp, hourlyTemps, loading, error, fetchWeather } = useWeather();
+    //const { currentTemp, hourlyTemps, loading, error, fetchWeather } = useWeather();
+    const { currentTemp, hourlyTemps, aiRecommendation, loading, error, fetchWeather } = useWeather();
+
 
     return (
         <div className="border border-gray-200 rounded-xl p-6 text-center max-w-[350px] mx-auto bg-white shadow-md">
-            <h3 className="text-xl font-bold mb-2">🌤️ 서울 날씨</h3>
+            <h3 className="text-xl font-bold mb-2">🌤️ 서울 날씨 & AI 코디 </h3>
 
             {/* 로딩 & 에러 처리 */}
             {loading && <p className="text-blue-600">데이터 배달 중... 🚚</p>}
@@ -25,6 +27,20 @@ export default function WeatherWidget() {
                     </div>
                 </div>
             )}
+
+
+            {/* 👇 AI 추천 영역 추가! ⭐ */}
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500 text-left">
+                <p className="font-bold text-blue-600 mb-1">🤖 AI 스타일리스트의 조언:</p>
+
+                {aiRecommendation ? (
+                    // AI 답변이 도착했을 때
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{aiRecommendation}</p>
+                ) : (
+                    // AI 답변을 기다리는 중일 때
+                    <p className="text-sm text-gray-400">열심히 고민 중이에요... 🤔</p>
+                )}
+            </div>
 
             <button
                 onClick={fetchWeather}
