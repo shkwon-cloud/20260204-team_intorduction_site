@@ -1,35 +1,54 @@
-import { useState, useMemo, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useMemo } from 'react';
 import type { TeamMember } from '../types/team.ts';
 
-export const useTeam = () => {
-    const [members, setMembers] = useState<TeamMember[]>([]);
-    const [onlyOnline, setOnlyOnline] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+// main.py의 데이터를 프론트엔드 소스코드에 직접 포함
+const STATIC_MEMBERS: TeamMember[] = [
+    {
+        "id": 1,
+        "name": "Alex Rivera",
+        "role": "Lead Architect",
+        "bio": "Specializes in cloud infrastructure and distributed systems.",
+        "imageUrl": "https://i.pravatar.cc/300?u=alex",
+        "isOnline": true
+    },
+    {
+        "id": 2,
+        "name": "Sarah Chen",
+        "role": "UI/UX Designer",
+        "bio": "Passionate about creating intuitive and beautiful user interfaces.",
+        "imageUrl": "https://i.pravatar.cc/300?u=sarah",
+        "isOnline": false
+    },
+    {
+        "id": 3,
+        "name": "Jordan Lee",
+        "role": "Frontend Developer",
+        "bio": "Expert in React, Tailwind CSS, and performance optimization.",
+        "imageUrl": "https://i.pravatar.cc/300?u=jordan",
+        "isOnline": true
+    },
+    {
+        "id": 4,
+        "name": "Mikael Sund",
+        "role": "Product Manager",
+        "bio": "Bridge between users and technical teams across global markets.",
+        "imageUrl": "https://i.pravatar.cc/300?u=mikael",
+        "isOnline": false
+    }
+];
 
-    useEffect(() => {
-        const fetchMembers = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:8000/members');
-                // 데이터가 배열인지 확인 (FastAPI가 { members: [] } 형태로 줄 수도 있음)
-                const data = Array.isArray(response.data) ? response.data : response.data.members || [];
-                setMembers(data);
-            } catch (err) {
-                console.error("멤버 목록 전역 로드 실패:", err);
-                setError("팀원 목록을 불러오는데 실패했습니다.");
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchMembers();
-    }, []);
+export const useTeam = () => {
+    const [onlyOnline, setOnlyOnline] = useState(false);
+
+    // 로딩과 에러 상태는 이제 더 이상 필요하지 않지만 인터페이스 유지를 위해 남겨둠
+    const loading = false;
+    const error = null;
 
     const filteredMembers = useMemo(() => {
         return onlyOnline
-            ? members.filter(member => member.isOnline)
-            : members;
-    }, [onlyOnline, members]);
+            ? STATIC_MEMBERS.filter(member => member.isOnline)
+            : STATIC_MEMBERS;
+    }, [onlyOnline]);
 
     const toggleFilter = () => setOnlyOnline(prev => !prev);
 

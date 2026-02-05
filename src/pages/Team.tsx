@@ -7,18 +7,18 @@ import WeatherWidget from '../components/WeatherWidget';
 
 
 const Team = () => {
+    // 소스코드에 포함된 자체 정보를 사용하여 팀원 목록을 표시합니다.
     const { members, onlyOnline, toggleFilter, loading, error } = useTeam();
 
     if (loading) return <div className="py-20 text-center text-slate-500">Loading members...</div>;
     if (error) return <div className="py-20 text-center text-red-500">{error}</div>;
-
 
     return (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
             <div className="text-center space-y-4 max-w-2xl mx-auto">
                 <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">Our Experts</h2>
                 <p className="text-slate-400 text-lg">
-                    Meet the world-class professionals who make our vision a reality every single day.
+                    Meet Alex, Sarah, Jordan, and Mikael — our world-class professionals.
                 </p>
             </div>
 

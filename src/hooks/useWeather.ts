@@ -42,7 +42,7 @@ export default function useWeather() {
     const getAiRecommendation = async (temp: number, location: string, style?: string, gender?: string) => {
         try {
             const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY || "");
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
             let prompt = `현재 ${location}의 기온이 섭씨 ${temp}도아. `;
             if (style && gender) {
