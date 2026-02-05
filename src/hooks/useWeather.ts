@@ -42,7 +42,7 @@ export default function useWeather() {
     const getAiRecommendation = async (temp: number, location: string, style?: string, gender?: string) => {
         try {
             const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // updated model name if needed, usually flash-2 is better but 1.5 is standard
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // updated model name if needed, usually flash-2 is better but 1.5 is standard
 
             let prompt = `현재 ${location}의 기온이 섭씨 ${temp}도아. `;
             if (style && gender) {
@@ -57,9 +57,19 @@ export default function useWeather() {
             const text = response.text();
 
             setAiRecommendation(text);
-        } catch (error) {
-            console.error("AI 추천 실패:", error);
-            setAiRecommendation("AI 스타일리스트가 잠시 자리를 비웠어요. 😅");
+        } catch (error: any) {
+            console.error("--- AI 추천 시스템 상세 에러 ---");
+            console.error("에러 타입:", error?.name);
+            console.error("에러 메시지:", error?.message);
+            console.error("상세 정보:", error);
+
+            if (error?.message?.includes("API_KEY_INVALID")) {
+                setAiRecommendation("API 키가 올바르지 않습니다. 환경 변수를 확인해주세요. 🔑");
+            } else if (error?.message?.includes("quota")) {
+                setAiRecommendation("API 사용량이 초과되었습니다. 잠시 후 다시 시도해주세요. ⏳");
+            } else {
+                setAiRecommendation(`AI 추천 중 오류가 발생했습니다: ${error?.message || "알 수 없는 에러"} 😅`);
+            }
         }
     };
 
