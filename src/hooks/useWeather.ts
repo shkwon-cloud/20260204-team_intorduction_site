@@ -41,8 +41,8 @@ export default function useWeather() {
     // ============================================================
     const getAiRecommendation = async (temp: number, location: string, style?: string, gender?: string) => {
         try {
-            const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // updated model name if needed, usually flash-2 is better but 1.5 is standard
+            const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY || "");
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
             let prompt = `현재 ${location}의 기온이 섭씨 ${temp}도아. `;
             if (style && gender) {
