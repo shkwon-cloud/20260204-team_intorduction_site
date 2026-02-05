@@ -6,92 +6,91 @@ import axios from 'axios';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function useWeather() {
-    // 1. 상태(State) 바구니들
     const [currentTemp, setCurrentTemp] = useState<number | null>(null);
     const [hourlyTemps, setHourlyTemps] = useState<number[]>([]);
-
-    // 2. 옷차림 추천을 담을 State 추가
     const [aiRecommendation, setAiRecommendation] = useState<string | null>(null);
-
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     // ============================================================
-    // 함수 A: 데이터 심부름꾼 (getWeatherData)
-    // 역할: 오직 Axios로 데이터를 가져와서 리턴만 함 (State 모름)
+    // 함수 A-1: 지오코딩 (getGeoLocation)
+    // 역할: 도시 이름을 위도/경도로 변환
     // ============================================================
-    const getWeatherData = async () => {
-        const url = "https://api.open-meteo.com/v1/forecast?latitude=37.5&longitude=126.9&current_weather=true&hourly=temperature_2m";
-        const response = await axios.get(url);
-        return response.data; // 데이터를 밖으로 던져줍니다.
+    const getGeoLocation = async (location: string) => {
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=ko&format=json`;
+        const response = await axios.get(geoUrl);
+        if (!response.data.results || response.data.results.length === 0) {
+            throw new Error("위치 정보를 찾을 수 없습니다.");
+        }
+        return response.data.results[0];
     };
 
+    // ============================================================
+    // 함수 A-2: 데이터 심부름꾼 (getWeatherData)
+    // 역할: 위도/경도를 받아 날씨 데이터를 가져옴
+    // ============================================================
+    const getWeatherData = async (lat: number, lon: number) => {
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=temperature_2m`;
+        const response = await axios.get(url);
+        return response.data;
+    };
 
     // ============================================================
-    // 함수 C: AI 스타일리스트 (getAiRecommendation) - NEW! ⭐
-    // 역할: 기온을 입력받아 Gemini에게 옷차림을 물어봄
+    // 함수 C: AI 스타일리스트 (getAiRecommendation)
+    // 역할: 날씨, 스타일, 성별을 모두 고려해 Gemini에게 옷차림을 물어봄
     // ============================================================
-    const getAiRecommendation = async (temp: number) => {
+    const getAiRecommendation = async (temp: number, location: string, style?: string, gender?: string) => {
         try {
-            // 1. API Key로 Gemini 연결 (Vite 방식)
             const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // updated model name if needed, usually flash-2 is better but 1.5 is standard
 
-            // 2. 프롬프트 작성 (구체적일수록 좋습니다)
-            const prompt = `현재 서울 기온이 섭씨 ${temp}도야. 이 날씨에 어울리는 한국의 20대 남성 옷차림을 3줄 이내로 간결하게 추천해줘. 말투는 친근한 스타일리스트처럼 해줘.`;
+            let prompt = `현재 ${location}의 기온이 섭씨 ${temp}도아. `;
+            if (style && gender) {
+                prompt += `평소 ${style} 스타일을 선호하는 ${gender}에게 어울리는 구체적인 오늘의 코디를 추천해줘. `;
+            } else {
+                prompt += `이 날씨에 어울리는 적절한 옷차림을 추천해줘. `;
+            }
+            prompt += `패션 잡지 에디터처럼 전문적이면서도 세련된 말투로 3~4문장 정도로 정중하게 추천해줘.`;
 
-            // 3. 질문하고 답변 받기
             const result = await model.generateContent(prompt);
             const response = await result.response;
             const text = response.text();
 
-            // 4. 답변을 State에 저장
             setAiRecommendation(text);
-
         } catch (error) {
             console.error("AI 추천 실패:", error);
             setAiRecommendation("AI 스타일리스트가 잠시 자리를 비웠어요. 😅");
         }
     };
 
-
-
-
     // ============================================================
     // 함수 B: 화면 관리자 (fetchWeather)
-    // 역할: 로딩 켜고, 심부름꾼(A) 시키고, 받아온 걸 State에 담음
     // ============================================================
-    const fetchWeather = async () => {
+    const fetchWeather = async (locationName: string = "Seoul", style?: string, gender?: string) => {
         try {
             setLoading(true);
             setError(null);
-            setCurrentTemp(null);
-            setHourlyTemps([]);
-
-            // 추천 멘트도 초기화
             setAiRecommendation(null);
 
-            // 1. 심부름꾼에게 다녀오라고 시킴
-            const data = await getWeatherData();
+            // 1. 위치 정보(위도/경도) 가져오기
+            const geo = await getGeoLocation(locationName);
 
-            // 2. 받아온 데이터를 State에 예쁘게 정리
+            // 2. 날씨 데이터 가져오기
+            const data = await getWeatherData(geo.latitude, geo.longitude);
+
+            // 3. 상태 업데이트
             setCurrentTemp(data.current_weather.temperature);
             setHourlyTemps(data.hourly.temperature_2m);
 
-            // ★ 중요: 날씨 데이터를 받자마자 AI에게 추천을 의뢰합니다.
-            // (await를 걸지 않아서, 날씨가 먼저 뜨고 AI 답변은 나중에 뜹니다)
-            getAiRecommendation(data.current_weather.temperature);
+            // 4. AI 추천 의뢰
+            getAiRecommendation(data.current_weather.temperature, locationName, style, gender);
 
-        } catch (err) {
-            setError("날씨 데이터를 가져오는데 실패했습니다.");
+        } catch (err: any) {
+            setError(err.message || "날씨 데이터를 가져오는데 실패했습니다.");
         } finally {
             setLoading(false);
         }
     };
 
-    // 컴포넌트는 심부름꾼(getWeatherData)은 몰라도 되고, 
-    // 관리자(fetchWeather)와 결과값들만 알면 됩니다.
-    //return { currentTemp, hourlyTemps, loading, error, fetchWeather };
     return { currentTemp, hourlyTemps, aiRecommendation, loading, error, fetchWeather };
-
 }

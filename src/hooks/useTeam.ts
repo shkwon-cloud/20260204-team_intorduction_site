@@ -1,50 +1,35 @@
-// src/hooks/useTeam.ts
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import axios from 'axios';
 import type { TeamMember } from '../types/team.ts';
 
-const MOCK_MEMBERS: TeamMember[] = [
-    {
-        id: 1,
-        name: 'Alex Rivera',
-        role: 'Lead Architect',
-        bio: 'Specializes in cloud infrastructure and distributed systems.',
-        imageUrl: 'https://i.pravatar.cc/300?u=alex',
-        isOnline: true,
-    },
-    {
-        id: 2,
-        name: 'Sarah Chen',
-        role: 'UI/UX Designer',
-        bio: 'Passionate about creating intuitive and beautiful user interfaces.',
-        imageUrl: 'https://i.pravatar.cc/300?u=sarah',
-        isOnline: false,
-    },
-    {
-        id: 3,
-        name: 'Jordan Lee',
-        role: 'Frontend Developer',
-        bio: 'Expert in React, Tailwind CSS, and performance optimization.',
-        imageUrl: 'https://i.pravatar.cc/300?u=jordan',
-        isOnline: true,
-    },
-    {
-        id: 4,
-        name: 'Mikael Sund',
-        role: 'Product Manager',
-        bio: 'Bridge between users and technical teams across global markets.',
-        imageUrl: 'https://i.pravatar.cc/300?u=mikael',
-        isOnline: false,
-    },
-];
-
 export const useTeam = () => {
+    const [members, setMembers] = useState<TeamMember[]>([]);
     const [onlyOnline, setOnlyOnline] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/members');
+                // 데이터가 배열인지 확인 (FastAPI가 { members: [] } 형태로 줄 수도 있음)
+                const data = Array.isArray(response.data) ? response.data : response.data.members || [];
+                setMembers(data);
+            } catch (err) {
+                console.error("멤버 목록 전역 로드 실패:", err);
+                setError("팀원 목록을 불러오는데 실패했습니다.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchMembers();
+    }, []);
 
     const filteredMembers = useMemo(() => {
         return onlyOnline
-            ? MOCK_MEMBERS.filter(member => member.isOnline)
-            : MOCK_MEMBERS;
-    }, [onlyOnline]);
+            ? members.filter(member => member.isOnline)
+            : members;
+    }, [onlyOnline, members]);
 
     const toggleFilter = () => setOnlyOnline(prev => !prev);
 
@@ -52,5 +37,7 @@ export const useTeam = () => {
         members: filteredMembers,
         onlyOnline,
         toggleFilter,
+        loading,
+        error
     };
 };

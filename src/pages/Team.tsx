@@ -7,7 +7,11 @@ import WeatherWidget from '../components/WeatherWidget';
 
 
 const Team = () => {
-    const { members, onlyOnline, toggleFilter } = useTeam();
+    const { members, onlyOnline, toggleFilter, loading, error } = useTeam();
+
+    if (loading) return <div className="py-20 text-center text-slate-500">Loading members...</div>;
+    if (error) return <div className="py-20 text-center text-red-500">{error}</div>;
+
 
     return (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
